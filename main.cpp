@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <queue>
 #include <stack>
+#include <climits> // For INT_MAX
 using namespace std;
 
 // Struct for representing a delivery route (edge)
@@ -12,12 +13,12 @@ struct Edge {
 };
 
 // Alias for adjacency list entries
-typedef pair<string, int> Pair;
+typedef pair<int, string> Pair; // (distance, node)
 
 // Graph class for the package delivery network
 class Graph {
 public:
-    unordered_map<string, vector<Pair>> adjList;  // Adjacency list for centers
+    unordered_map<string, vector<pair<string, int>>> adjList;  // Adjacency list for centers
 
     // Graph constructor
     Graph(vector<Edge> const &edges) {
@@ -39,55 +40,59 @@ public:
         }
     }
 
-    // Perform Depth-First Search (DFS)
-    void DFS(string start) {
-        unordered_map<string, bool> visited;
-        stack<string> s;
+    // Find shortest path using Dijkstra's algorithm
+    void findShortestPath(string start) {
+        unordered_map<string, int> distances; // Stores shortest distances to each node
+        unordered_map<string, string> previous; // Tracks the previous node in the path
+        for (auto &node : adjList) {
+            distances[node.first] = INT_MAX; // Initialize distances as infinite
+        }
+        distances[start] = 0;
 
-        s.push(start);
+        // Min-heap priority queue: (distance, node)
+        priority_queue<Pair, vector<Pair>, greater<Pair>> pq;
+        pq.push({0, start}); // Push initial node with distance 0
 
-        cout << "DFS starting from " << start << ": ";
-        while (!s.empty()) {
-            string center = s.top();
-            s.pop();
+        while (!pq.empty()) {
+            Pair top = pq.top();  // Extract top element
+            pq.pop();
 
-            if (!visited[center]) {
-                visited[center] = true;
-                cout << center << " ";
-            }
+            int currentDistance = top.first; // Distance of the current node
+            string currentNode = top.second; // Node being processed
 
-            for (auto &neighbor : adjList[center]) {
-                if (!visited[neighbor.first]) {
-                    s.push(neighbor.first);
+            // Process neighbors
+            for (auto &neighbor : adjList[currentNode]) {
+                string nextNode = neighbor.first;
+                int edgeWeight = neighbor.second;
+
+                int newDistance = currentDistance + edgeWeight;
+                if (newDistance < distances[nextNode]) {
+                    distances[nextNode] = newDistance;
+                    previous[nextNode] = currentNode;
+                    pq.push({newDistance, nextNode});
                 }
             }
         }
-        cout << endl;
-    }
 
-    // Perform Breadth-First Search (BFS)
-    void BFS(string start) {
-        unordered_map<string, bool> visited;
-        queue<string> q;
+        // Print shortest distances
+        cout << "\nShortest Path Distances from " << start << ":\n";
+        for (auto &node : distances) {
+            cout << node.first << " - " << (node.second == INT_MAX ? "Unreachable" : to_string(node.second) + " hours") << endl;
+        }
 
-        q.push(start);
-        visited[start] = true;
-
-        cout << "BFS starting from " << start << ": ";
-        while (!q.empty()) {
-            string center = q.front();
-            q.pop();
-
-            cout << center << " ";
-
-            for (auto &neighbor : adjList[center]) {
-                if (!visited[neighbor.first]) {
-                    q.push(neighbor.first);
-                    visited[neighbor.first] = true;
+        // Print paths to each node
+        cout << "\nPaths from " << start << ":\n";
+        for (auto &node : distances) {
+            if (node.second != INT_MAX) {
+                string path = node.first;
+                string current = node.first;
+                while (previous.find(current) != previous.end()) {
+                    current = previous[current];
+                    path = current + " -> " + path;
                 }
+                cout << path << " (" << node.second << " hours)\n";
             }
         }
-        cout << endl;
     }
 };
 
@@ -105,11 +110,8 @@ int main() {
     // Print the graph
     graph.printGraph();
 
-    // Perform DFS starting from Center 1
-    graph.DFS("Center 1");
-
-    // Perform BFS starting from Center 1
-    graph.BFS("Center 1");
+    // Find shortest paths from Center 1
+    graph.findShortestPath("Center 1");
 
     return 0;
 }
