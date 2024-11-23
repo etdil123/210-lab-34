@@ -2,41 +2,40 @@
 #include <vector>
 #include <queue>
 #include <stack>
-#include <unordered_set>
 using namespace std;
 
-const int SIZE = 7;
+// Updated graph size to accommodate all nodes (0 to 11)
+const int SIZE = 9;
 
 struct Edge {
     int src, dest, weight;
 };
 
-typedef pair<int, int> Pair;  // Alias 'Pair' for the pair<int, int> data type
+typedef pair<int, int> Pair;
 
 class Graph {
 public:
-    // a vector of vectors of Pairs to represent an adjacency list
     vector<vector<Pair>> adjList;
 
-    // Graph Constructor
     Graph(vector<Edge> const &edges) {
-        // resize the vector to hold SIZE elements of type vector<Edge>
         adjList.resize(SIZE);
 
-        // add edges to the directed graph
         for (auto &edge: edges) {
             int src = edge.src;
             int dest = edge.dest;
             int weight = edge.weight;
 
-            // insert at the end
+            // Ensure the edge references valid nodes
+            if (src >= SIZE || dest >= SIZE || src < 0 || dest < 0) {
+                cerr << "Invalid edge: (" << src << ", " << dest << ")" << endl;
+                continue;
+            }
+
             adjList[src].push_back(make_pair(dest, weight));
-            // for an undirected graph, add an edge from dest to src also
-            adjList[dest].push_back(make_pair(src, weight));
+            adjList[dest].push_back(make_pair(src, weight));  // For undirected graph
         }
     }
 
-    // Print the graph's adjacency list
     void printGraph() {
         cout << "Graph's adjacency list:" << endl;
         for (int i = 0; i < adjList.size(); i++) {
@@ -47,7 +46,6 @@ public:
         }
     }
 
-    // DFS function
     void DFS(int start) {
         vector<bool> visited(SIZE, false);
         stack<int> s;
@@ -60,8 +58,8 @@ public:
             s.pop();
 
             if (!visited[v]) {
-                cout << v << " ";
                 visited[v] = true;
+                cout << v << " ";
             }
 
             for (auto &neighbor : adjList[v]) {
@@ -73,7 +71,6 @@ public:
         cout << endl;
     }
 
-    // BFS function
     void BFS(int start) {
         vector<bool> visited(SIZE, false);
         queue<int> q;
@@ -100,16 +97,19 @@ public:
 };
 
 int main() {
-    // Creates a vector of graph edges/weights
+    // Updating the graph by deleting two nodes and adding 6 nodes
     vector<Edge> edges = {
-        // (x, y, w) —> edge from x to y having weight w
-        {0,1,12},{0,2,8},{0,3,21},{2,3,6},{2,6,2},{5,6,6},{4,5,9},{2,4,4},{2,5,5}
+        {0, 1, 10}, {0, 2, 15}, {0, 4, 20},
+        {1, 5, 25}, {2, 4, 30}, {2, 7, 12},
+        {4, 8, 18}, {5, 3, 22}, {7, 8, 14},
+        {8, 9, 35}, {7, 10, 19}, {6, 10, 24},
+        {8, 6, 17}, {9, 11, 20}
     };
 
-    // Creates graph
+    // Creates the graph
     Graph graph(edges);
 
-    // Prints adjacency list representation of graph
+    // Prints adjacency list
     graph.printGraph();
 
     // Perform DFS starting from node 0
