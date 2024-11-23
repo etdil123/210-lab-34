@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <queue>
+#include <stack>
+#include <unordered_set>
 using namespace std;
 
 const int SIZE = 7;
@@ -8,7 +11,7 @@ struct Edge {
     int src, dest, weight;
 };
 
-typedef pair<int, int> Pair;  // Creates alias 'Pair' for the pair<int,int> data type
+typedef pair<int, int> Pair;  // Alias 'Pair' for the pair<int, int> data type
 
 class Graph {
 public:
@@ -43,6 +46,57 @@ public:
             cout << endl;
         }
     }
+
+    // DFS function
+    void DFS(int start) {
+        vector<bool> visited(SIZE, false);
+        stack<int> s;
+
+        s.push(start);
+
+        cout << "DFS starting from node " << start << ": ";
+        while (!s.empty()) {
+            int v = s.top();
+            s.pop();
+
+            if (!visited[v]) {
+                cout << v << " ";
+                visited[v] = true;
+            }
+
+            for (auto &neighbor : adjList[v]) {
+                if (!visited[neighbor.first]) {
+                    s.push(neighbor.first);
+                }
+            }
+        }
+        cout << endl;
+    }
+
+    // BFS function
+    void BFS(int start) {
+        vector<bool> visited(SIZE, false);
+        queue<int> q;
+
+        q.push(start);
+        visited[start] = true;
+
+        cout << "BFS starting from node " << start << ": ";
+        while (!q.empty()) {
+            int v = q.front();
+            q.pop();
+
+            cout << v << " ";
+
+            for (auto &neighbor : adjList[v]) {
+                if (!visited[neighbor.first]) {
+                    q.push(neighbor.first);
+                    visited[neighbor.first] = true;
+                }
+            }
+        }
+        cout << endl;
+    }
 };
 
 int main() {
@@ -57,6 +111,12 @@ int main() {
 
     // Prints adjacency list representation of graph
     graph.printGraph();
+
+    // Perform DFS starting from node 0
+    graph.DFS(0);
+
+    // Perform BFS starting from node 0
+    graph.BFS(0);
 
     return 0;
 }
