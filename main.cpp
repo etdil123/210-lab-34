@@ -1,68 +1,62 @@
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include <queue>
 #include <stack>
 using namespace std;
 
-// Updated graph size to accommodate all nodes (0 to 11)
-const int SIZE = 9;
-
+// Struct for representing a delivery route (edge)
 struct Edge {
-    int src, dest, weight;
+    string src, dest;  // Distribution centers
+    int time;          // Travel time in hours
 };
 
-typedef pair<int, int> Pair;
+// Alias for adjacency list entries
+typedef pair<string, int> Pair;
 
+// Graph class for the package delivery network
 class Graph {
 public:
-    vector<vector<Pair>> adjList;
+    unordered_map<string, vector<Pair>> adjList;  // Adjacency list for centers
 
+    // Graph constructor
     Graph(vector<Edge> const &edges) {
-        adjList.resize(SIZE);
-
-        for (auto &edge: edges) {
-            int src = edge.src;
-            int dest = edge.dest;
-            int weight = edge.weight;
-
-            // Ensure the edge references valid nodes
-            if (src >= SIZE || dest >= SIZE || src < 0 || dest < 0) {
-                cerr << "Invalid edge: (" << src << ", " << dest << ")" << endl;
-                continue;
-            }
-
-            adjList[src].push_back(make_pair(dest, weight));
-            adjList[dest].push_back(make_pair(src, weight));  // For undirected graph
+        for (auto &edge : edges) {
+            adjList[edge.src].push_back({edge.dest, edge.time});
+            adjList[edge.dest].push_back({edge.src, edge.time});  // Undirected graph
         }
     }
 
+    // Print the graph's adjacency list
     void printGraph() {
-        cout << "Graph's adjacency list:" << endl;
-        for (int i = 0; i < adjList.size(); i++) {
-            cout << i << " --> ";
-            for (Pair v : adjList[i])
-                cout << "(" << v.first << ", " << v.second << ") ";
+        cout << "Package Delivery Network:" << endl;
+        for (auto &node : adjList) {
+            cout << node.first << " --> ";
+            for (auto &neighbor : node.second) {
+                cout << "(" << neighbor.first << ", " << neighbor.second << " hours) ";
+            }
             cout << endl;
         }
     }
 
-    void DFS(int start) {
-        vector<bool> visited(SIZE, false);
-        stack<int> s;
+    // Perform Depth-First Search (DFS)
+    void DFS(string start) {
+        unordered_map<string, bool> visited;
+        stack<string> s;
 
         s.push(start);
 
-        cout << "DFS starting from node " << start << ": ";
+        cout << "DFS starting from " << start << ": ";
         while (!s.empty()) {
-            int v = s.top();
+            string center = s.top();
             s.pop();
 
-            if (!visited[v]) {
-                visited[v] = true;
-                cout << v << " ";
+            if (!visited[center]) {
+                visited[center] = true;
+                cout << center << " ";
             }
 
-            for (auto &neighbor : adjList[v]) {
+            for (auto &neighbor : adjList[center]) {
                 if (!visited[neighbor.first]) {
                     s.push(neighbor.first);
                 }
@@ -71,21 +65,22 @@ public:
         cout << endl;
     }
 
-    void BFS(int start) {
-        vector<bool> visited(SIZE, false);
-        queue<int> q;
+    // Perform Breadth-First Search (BFS)
+    void BFS(string start) {
+        unordered_map<string, bool> visited;
+        queue<string> q;
 
         q.push(start);
         visited[start] = true;
 
-        cout << "BFS starting from node " << start << ": ";
+        cout << "BFS starting from " << start << ": ";
         while (!q.empty()) {
-            int v = q.front();
+            string center = q.front();
             q.pop();
 
-            cout << v << " ";
+            cout << center << " ";
 
-            for (auto &neighbor : adjList[v]) {
+            for (auto &neighbor : adjList[center]) {
                 if (!visited[neighbor.first]) {
                     q.push(neighbor.first);
                     visited[neighbor.first] = true;
@@ -97,26 +92,24 @@ public:
 };
 
 int main() {
-    // Updating the graph by deleting two nodes and adding 6 nodes
+    // Define the package delivery network (distribution centers and direct routes)
     vector<Edge> edges = {
-        {0, 1, 10}, {0, 2, 15}, {0, 4, 20},
-        {1, 5, 25}, {2, 4, 30}, {2, 7, 12},
-        {4, 8, 18}, {5, 3, 22}, {7, 8, 14},
-        {8, 9, 35}, {7, 10, 19}, {6, 10, 24},
-        {8, 6, 17}, {9, 11, 20}
+        {"Center 1", "Center 2", 2}, {"Center 1", "Center 3", 4}, {"Center 2", "Center 4", 1},
+        {"Center 3", "Center 4", 3}, {"Center 3", "Center 5", 6}, {"Center 4", "Center 5", 2},
+        {"Center 2", "Center 6", 5}, {"Center 5", "Center 6", 4}
     };
 
-    // Creates the graph
+    // Create the graph
     Graph graph(edges);
 
-    // Prints adjacency list
+    // Print the graph
     graph.printGraph();
 
-    // Perform DFS starting from node 0
-    graph.DFS(0);
+    // Perform DFS starting from Center 1
+    graph.DFS("Center 1");
 
-    // Perform BFS starting from node 0
-    graph.BFS(0);
+    // Perform BFS starting from Center 1
+    graph.BFS("Center 1");
 
     return 0;
 }
