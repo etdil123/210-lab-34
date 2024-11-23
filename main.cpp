@@ -25,7 +25,7 @@ public:
         }
     }
 
-    // Display the adjacency list
+    // Display the adjacency list - Prompt engineered
     void displayGraph() {
         cout << "Package Delivery Network (Adjacency List):\n";
         for (auto &node : adjList) {
@@ -37,7 +37,7 @@ public:
         }
     }
 
-    // Perform Depth-First Search (DFS)
+    // Perform Depth-First Search (DFS) - Prompt engineered
     void DFS(string start) {
         unordered_map<string, bool> visited;
         stack<string> s;
@@ -63,7 +63,7 @@ public:
         cout << endl;
     }
 
-    // Perform Breadth-First Search (BFS)
+    // Perform Breadth-First Search (BFS) - Prompt engineered
     void BFS(string start) {
         unordered_map<string, bool> visited;
         queue<string> q;
@@ -88,7 +88,7 @@ public:
         cout << endl;
     }
 
-    // Find shortest paths using Dijkstra's Algorithm
+    // Find shortest paths - Prompt engineered
     void findShortestPaths(string start) {
         unordered_map<string, int> distances; // Stores shortest distances
         for (auto &node : adjList) {
@@ -116,7 +116,7 @@ public:
             }
         }
 
-        // Print shortest paths
+        // Print shortest paths - Prompt engineered
         cout << "\nShortest Paths from " << start << ":\n";
         for (auto &node : distances) {
             cout << node.first << ": ";
@@ -128,7 +128,7 @@ public:
         }
     }
 
-    // Find the Minimum Spanning Tree (Prim's Algorithm)
+    // Find the Minimum Spanning Tree (Prim's Algorithm) - Prompt engineered
     void findMST(string start) {
         unordered_map<string, bool> inMST;  // Tracks if a node is in the MST
         unordered_map<string, int> key;    // Minimum edge weight for each node
@@ -163,7 +163,7 @@ public:
             }
         }
 
-        // Print the MST
+        // Print the MST- Prompt engineered
         cout << "\nMinimum Spanning Tree (MST):\n";
         int totalWeight = 0;
         for (auto &node : parent) {
@@ -175,7 +175,7 @@ public:
 };
 
 int main() {
-    // Define the package delivery network (distribution centers and direct routes)
+    // Define the package delivery network (distribution centers and direct routes) - Prompt engineered
     vector<Edge> edges = {
         {"Center 1", "Center 2", 2}, {"Center 1", "Center 3", 4}, {"Center 2", "Center 4", 1},
         {"Center 3", "Center 4", 3}, {"Center 3", "Center 5", 6}, {"Center 4", "Center 5", 2},
@@ -185,6 +185,7 @@ int main() {
     // Create the graph
     Graph graph(edges);
 
+    // Menu for user to select which option
     while (true) {
         cout << "\nMenu:\n";
         cout << "1. Display Package Delivery Network\n";
